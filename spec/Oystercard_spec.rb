@@ -2,6 +2,8 @@ require 'oystercard'
 
 describe Oystercard do 
   
+  let(:station) { double :station }
+
   it 'checks whether the balance is zero' do
     expect(subject.balance).to eq (0)
   end
@@ -23,26 +25,31 @@ describe Oystercard do
 
   it 'changes the attribute in_journey to true after touching in' do 
     subject.top_up(50)
-    subject.touch_in 
+    subject.touch_in(station)
    expect(subject).to be_in_journey
   end 
 
   it 'changes the attribute in_jouney to be false after touching in then out' do 
     subject.top_up(50)
-    subject.touch_in 
+    subject.touch_in(station) 
     subject.touch_out
     expect(subject).not_to be_in_journey
    end 
 
    it 'raises an error if there is not at least £1 on the card when touching in' do 
     subject.top_up(0.50)
-    expect { subject.touch_in }.to raise_error 'Insufficient funds'
+    expect { subject.touch_in(station) }.to raise_error 'Insufficient funds'
    end 
 
    it 'deducts from the card balance when touching out after touching in' do 
     subject.top_up(50)
-    subject.touch_in 
+    subject.touch_in(station)
     expect {subject.touch_out}.to change{subject.balance}.by(-Oystercard::MINIMUM_BALANCE)
    end 
 
+   it 'stores the entry station when touching in.' do 
+    subject.top_up(50)
+    subject.touch_in(station)
+    expect(subject.entry_station).to eq station 
+   end 
 end 
