@@ -17,13 +17,25 @@ describe Oystercard do
     expect {subject.top_up 1 }.to raise_error "maximum limit of #{limit} exceeded"
   end 
 
-  it 'recuces the balance when we spend money using the method deduct' do 
+  it 'reduces the balance when we spend money using the method deduct' do 
     subject.top_up(50)
     subject.deduct(4.25) 
     expect(subject.balance).to eq (45.75)
   end 
 
-  it 'checks weather touch in is working' do
-    expect{  subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
+  it 'Makes sure a new card is not in journey' do
+    expect(subject.in_journey).to eq (false)
   end
+
+  it 'changes the attribute in_journey to true after touching in' do 
+   subject.touch_in 
+   expect(subject.in_journey).to eq (true)
+  end 
+
+  it 'changes the attribute in_jouney to be false after touching in then out' do 
+    subject.touch_in 
+    subject.touch_out
+    expect(subject.in_journey?).to eq false
+   end 
+   
 end 
