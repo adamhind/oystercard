@@ -17,25 +17,32 @@ describe Oystercard do
     expect {subject.top_up 1 }.to raise_error "maximum limit of #{limit} exceeded"
   end 
 
-  it 'reduces the balance when we spend money using the method deduct' do 
-    subject.top_up(50)
-    subject.deduct(4.25) 
-    expect(subject.balance).to eq (45.75)
-  end 
-
   it 'Makes sure a new card is not in journey' do
-    expect(subject.in_journey).to eq (false)
+    expect(subject).not_to be_in_journey
   end
 
   it 'changes the attribute in_journey to true after touching in' do 
-   subject.touch_in 
-   expect(subject.in_journey).to eq (true)
+    subject.top_up(50)
+    subject.touch_in 
+   expect(subject).to be_in_journey
   end 
 
   it 'changes the attribute in_jouney to be false after touching in then out' do 
+    subject.top_up(50)
     subject.touch_in 
     subject.touch_out
-    expect(subject.in_journey?).to eq false
+    expect(subject).not_to be_in_journey
    end 
-   
+
+   it 'raises an error if there is not at least £1 on the card when touching in' do 
+    subject.top_up(0.50)
+    expect { subject.touch_in }.to raise_error 'Insufficient funds'
+   end 
+
+   it 'deducts from the card balance when touching out after touching in' do 
+    subject.top_up(50)
+    subject.touch_in 
+    expect {subject.touch_out}.to change{subject.balance}.by(-Oystercard::MINIMUM_BALANCE)
+   end 
+
 end 
