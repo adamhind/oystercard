@@ -2,9 +2,10 @@ require 'oystercard'
 
 describe Oystercard do 
   
-  let(:station) { double :station }
+  let(:entry_station) { double :station }
+  let(:exit_station) { double :station }
 
-  it 'checks whether the balance is zero' do
+  it 'checks whether the balance begins at zero' do
     expect(subject.balance).to eq (0)
   end
   
@@ -25,31 +26,51 @@ describe Oystercard do
 
   it 'changes the attribute in_journey to true after touching in' do 
     subject.top_up(50)
-    subject.touch_in(station)
+    subject.touch_in(entry_station)
    expect(subject).to be_in_journey
   end 
 
   it 'changes the attribute in_jouney to be false after touching in then out' do 
     subject.top_up(50)
-    subject.touch_in(station) 
-    subject.touch_out
+    subject.touch_in(entry_station)
+    subject.touch_out(exit_station)
     expect(subject).not_to be_in_journey
    end 
 
    it 'raises an error if there is not at least £1 on the card when touching in' do 
     subject.top_up(0.50)
-    expect { subject.touch_in(station) }.to raise_error 'Insufficient funds'
+    expect { subject.touch_in(entry_station) }.to raise_error 'Insufficient funds'
    end 
 
    it 'deducts from the card balance when touching out after touching in' do 
     subject.top_up(50)
-    subject.touch_in(station)
-    expect {subject.touch_out}.to change{subject.balance}.by(-Oystercard::MINIMUM_BALANCE)
+    subject.touch_in(entry_station)
+    expect {subject.touch_out(exit_station)}.to change{subject.balance}.by(-Oystercard::MINIMUM_BALANCE)
    end 
 
    it 'stores the entry station when touching in.' do 
     subject.top_up(50)
-    subject.touch_in(station)
-    expect(subject.entry_station).to eq station 
+    subject.touch_in(entry_station)
+    expect(subject.entry_station).to eq (entry_station)
    end 
+
+   it 'stores a journey when you touch in and out of a station.' do 
+    subject.top_up(50)
+    subject.touch_in(entry_station)
+    subject.touch_out(exit_station)
+    expect(subject.exit_station).to eq (exit_station)
+   end
+
+   it 'has an empty list of journeys by default' do
+    expect(subject.journeys).to be_empty
+  end
+
+  let(:journey){ {entry_station: entry_station, exit_station: exit_station} }
+  
+  it 'stores journeys in a hash to be accessed later' do 
+    subject.top_up(50)
+    subject.touch_in(entry_station)
+    subject.touch_out(exit_station)
+    expect(subject.journeys).to include journey
+  end 
 end 
