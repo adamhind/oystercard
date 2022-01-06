@@ -37,31 +37,31 @@ describe Oystercard do
     expect(subject).not_to be_in_journey
    end 
 
-   it 'raises an error if there is not at least £1 on the card when touching in' do 
+  it 'raises an error if there is not at least £1 on the card when touching in' do 
     subject.top_up(0.50)
     expect { subject.touch_in(entry_station) }.to raise_error 'Insufficient funds'
-   end 
+  end 
 
-   it 'deducts from the card balance when touching out after touching in' do 
+  it 'deducts from the card balance when touching out after touching in' do 
     subject.top_up(50)
     subject.touch_in(entry_station)
     expect {subject.touch_out(exit_station)}.to change{subject.balance}.by(-Oystercard::MINIMUM_BALANCE)
-   end 
+  end 
 
-   it 'stores the entry station when touching in.' do 
+  it 'stores the entry station when touching in.' do 
     subject.top_up(50)
     subject.touch_in(entry_station)
     expect(subject.entry_station).to eq (entry_station)
-   end 
+  end 
 
-   it 'stores a journey when you touch in and out of a station.' do 
+  it 'stores a journey when you touch in and out of a station.' do 
     subject.top_up(50)
     subject.touch_in(entry_station)
     subject.touch_out(exit_station)
     expect(subject.exit_station).to eq (exit_station)
-   end
+  end
 
-   it 'has an empty list of journeys by default' do
+  it 'has an empty list of journeys by default' do
     expect(subject.journeys).to be_empty
   end
 
@@ -72,5 +72,6 @@ describe Oystercard do
     subject.touch_in(entry_station)
     subject.touch_out(exit_station)
     expect(subject.journeys).to include journey
-  end 
+  end
+
 end 
